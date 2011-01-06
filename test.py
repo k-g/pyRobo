@@ -42,6 +42,7 @@ def serialMonitor(serial_obj, alert_function):
     """
     The actual serial Thread
     """
+    global isAlive
     data=""
     dataList = deque([0,0,0,0,0,0,0,0,0,0,0,0])
     sig = SigWrapper(alert_function)
@@ -102,18 +103,71 @@ def openTelemetryThread(port_name, baud_rate, alert_function):
         print("Could not open port %s: %s" % (port_name, e))
     except RuntimeError, e:
         print("Runtime error: %s" (e))
-        
 
-def find_angle(array_start, array_end, rad_per_bucket):
+
+
+def error_calc(reference, secondary):
+    """
+    Accepts 2 slices of an array and it's time-shifted rotation.
+    These arrays must be the same length
+    """
+    error = 0
+    for i in range(len(reference)):
+        print "\t",reference
+        print "\t",secondary
+        print "\t-"*5
+        error += abs(reference[i] - secondary[i])
+
+
+    return error
+
+
+def find_angle(reference, secondary):
     """
     Finds the best guess for rotation based on the error, then returns the guessed angle we rotated.
     """
-    window_width    =   8               #width of search space. larger = slower, more accurate
-    offset_width    =   8               #amount of side-to-side oscillation. lower = faster, less accurate
+    
+    #these 2 must be even numbers th
+    window_width    =   4               #width of search space. larger = slower, more accurate
+    offset_width    =   6              #amount of side-to-side oscillation. lower = faster, less accurate
+    
     center          =   26              #center of rotation
     
     rad_inc         =   math.pi / 54    #used for determining angles
     angle_errors    =   {}              #map offset_angle => error
+
+    #setup reference window
+    ref_start   =   center - (window_width/2)
+    ref_end     =   ref_start + window_width
+    ref_window  =   reference[ref_start:ref_end]        #reference window to use
+
+    #setup loop
+    smallest_error   =   255                              #keep track of the smallest error we see
+    closest_angle   =   0                              #track the biggest error's angle
+    nearest_offset  =   0
+
+    for o in range(offset_width):
+        relative_offset     =   (o-offset_width/2)+1        #offset, relative to "center" to use, in array indices
+        angle               =   (rad_inc * 180/math.pi) * relative_offset #convert the index offset to degrees
+        
+        secondary_start     =   center  + relative_offset - window_width/2 #- (offset_width/2) + o
+
+        print secondary_start, secondary[secondary_start], relative_offset
+        secondary_end       =   secondary_start + window_width
+        secondary_window    =   secondary[secondary_start:secondary_end]
+
+        angle_errors[str(angle)] = error_calc(ref_window, secondary_window)
+        if angle_errors[str(angle)] < smallest_error:
+            smallest_error   =   angle_errors[str(angle)]
+            closest_angle   =   angle
+            nearest_offset  =   relative_offset
+             
+
+    print angle_errors
+    
+
+
+    return "Angle: ", closest_angle, "Offset: ", nearest_offset
 
 
 
@@ -122,36 +176,56 @@ def serialGenerate(serial_obj):
     """
     The generator thread
     """
-    #global isAlive
-    radians = 0.0
+    global isAlive
+    
     rad_inc = math.pi / 54
+    loops   = 2
+    l= 0
     while isAlive:
         try:
 
-            count_inc   =   0
-            readings    =   numpy.random.random_integers(80, 160, 54)
-            readings2   =   readings[1:53] + numpy.random.random_integers(80, 160, 1)
             
-            while count_inc  < 54:
-                time.sleep(0.02)
-                for character in "+$":
-                    serial_obj.write(character)
+            readings    =   numpy.random.random_integers(80, 160,  size=(70,))                  #simulated measurement
+            readings2   =  readings[2:]+numpy.random.randint(-10,10, size=(68,))                #simulated rotated second measurement
+            
+            print readings
+            print readings2
+            
+            while l < loops:
+                count_inc   =   0
+                radians = 0.0
+
+                while count_inc  < 54:
+                    time.sleep(0.02)
+                    for character in "+$":
+                        serial_obj.write(character)
+                    
+                    radians += rad_inc;
+                    if radians > (2 * math.pi):
+                        radians = 0.0
+                                    
+                    if l == 0:
+                        some_num = int(readings[count_inc])#int(random.randint(0, 5) + 120*(1 + math.sin(radians)))
+                    else:
+                        some_num = int(readings2[count_inc])#int(random.randint(0, 5) + 120*(1 + math.sin(radians)))
+
+
+                    serial_obj.write(num2hex(some_num))
+                    serial_obj.write(num2hex(count_inc))
+
+                    count_inc += 1
                 
-                radians += rad_inc;
-                if radians > (2 * math.pi):
-                    radians = 0.0
-                                
+                l += 1            
             
-                some_num = int(readings[count_inc])#int(random.randint(0, 5) + 120*(1 + math.sin(radians)))
+            isAlive = 0
 
-                serial_obj.write(num2hex(some_num))
-                serial_obj.write(num2hex(count_inc))
+            print find_angle(readings, readings2)
 
-                count_inc += 1
-
+            break;
 
         except exceptions.AttributeError, e:
-            pass    #most likely came during interpreter shutdown                
+            pass    #most likely came during interpreter shutdown 
+            #raise e               
         except serial.SerialException, e:
             print("Serial Thread Exception:", e)
         except serial.SerialTimeoutException, e:
