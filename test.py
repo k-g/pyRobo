@@ -5,7 +5,7 @@ import exceptions                   #for handling the standard array of crap tha
 #from collections import deque       #for saving incoming serial data as a queue
 #import random                       #for wave generating that is a little more interesting
 #import math                         #for sine wave generation and other fun math like pi
-#import numpy                        #obviously needed for randomness, list generation, etc.
+import numpy                        #obviously needed for randomness, list generation, etc.
 
 from util_functions import *        #my library of conversion functions and useful stuff
 from strip_chart import *           #pyQWT strip chart
@@ -16,13 +16,28 @@ from serial_threads import *
 #global variables
 t_thread = 0
 g_thread = 0
-
+updates = 0                    #counts our packets
+readings, readings2 = numpy.zeros(54),numpy.zeros(54)    #stores new and old data
+delta    =    None
 
 @QtCore.pyqtSlot(int,int)
 def updatePlots(value,theta):
     """
     The slot that updates local plots when new data arrives
     """
+    global readings, readings2, delta    
+    
+    #update buffers
+    readings2[theta]    =     value
+    
+    if theta == 53:
+        angle_str = str(find_angle(readings, readings2))
+        readings = readings2[:]        #deep copy on finish
+        delta.setText(angle_str)
+     
+
+    
+    
     global plot_update_signal_wrappers
     for sig in plot_update_signal_wrappers:
         sig.go(value,theta)
@@ -32,7 +47,7 @@ def make():
     """
     Setup the GUI, and plots
     """
-    global plot_update_signal_wrappers
+    global plot_update_signal_wrappers, delta
 
     #setup strip chart    
     stripWidget = Qt.QWidget()
@@ -58,7 +73,7 @@ def make():
     
     #set sizes
     stripWidget.resize(600, 400)
-    polarWidget.resize(600,600)
+    polarWidget.resize(600, 600)
 
     #setup main window
     windowWidget = Qt.QWidget()

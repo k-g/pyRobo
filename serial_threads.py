@@ -126,7 +126,7 @@ def serialMonitor(serial_obj, alert_function):
     data=""
     dataList = deque([0,0,0,0,0,0,0,0,0,0,0,0])
     sig = SigWrapper(alert_function)
-    
+
     while isAlive:
         try:
             the_new_val    =     serial_obj.read(1)
@@ -230,7 +230,7 @@ def serialGenerate(serial_obj):
             
             setAlive(0)
 
-            print find_angle(readings, readings2)
+            #print find_angle(readings, readings2)
 
             break;
 
