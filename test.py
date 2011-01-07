@@ -128,8 +128,8 @@ def find_angle(reference, secondary):
     """
     
     #these 2 must be even numbers th
-    window_width    =   4               #width of search space. larger = slower, more accurate
-    offset_width    =   6              #amount of side-to-side oscillation. lower = faster, less accurate
+    window_width    =   16               #width of search space. larger = slower, more accurate
+    offset_width    =   16              #amount of side-to-side oscillation. lower = faster, less accurate
     
     center          =   26              #center of rotation
     
@@ -171,6 +171,21 @@ def find_angle(reference, secondary):
 
 
 
+def generate_test_readings(shift_indices, size=80):
+    """
+    Returns a pair of readings. One is shifted and noisey
+    """
+    shift_size  =   -shift_indices           
+    start       =   numpy.random.random_integers(80, 160,  size=(size,))    #simulated measurement
+    end         =   (start[:]+numpy.random.randint(-10,10, size=(size,)))   #simulated noisey second measurement
+
+    #todo: add a 'spike' to help us verify rotation visually
+
+    readings    =   start[10:-10]                                           #take slices
+    readings2   =   end[10+shift_size:-10+shift_size]                       #take shifted slices
+
+    return readings.tolist(), readings2.tolist()
+
 
 def serialGenerate(serial_obj):
     """
@@ -184,12 +199,8 @@ def serialGenerate(serial_obj):
     while isAlive:
         try:
 
-            
-            readings    =   numpy.random.random_integers(80, 160,  size=(70,))                  #simulated measurement
-            readings2   =  readings[2:]+numpy.random.randint(-10,10, size=(68,))                #simulated rotated second measurement
-            
-            print readings
-            print readings2
+            readings, readings2 = generate_test_readings(-5)
+                     
             
             while l < loops:
                 count_inc   =   0
