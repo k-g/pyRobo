@@ -2,10 +2,10 @@ import serial                       #for serial communication
 import sys                          #This gets the commandline stuff for us
 import threading, time              #for threads, and delays
 import exceptions                   #for handling the standard array of crap that ails this file
-from collections import deque       #for saving incoming serial data as a queue
-import random                       #for wave generating that is a little more interesting
-import math                         #for sine wave generation and other fun math like pi
-import numpy                        #obviously needed for randomness, list generation, etc.
+#from collections import deque       #for saving incoming serial data as a queue
+#import random                       #for wave generating that is a little more interesting
+#import math                         #for sine wave generation and other fun math like pi
+#import numpy                        #obviously needed for randomness, list generation, etc.
 
 from util_functions import *        #my library of conversion functions and useful stuff
 from strip_chart import *           #pyQWT strip chart
@@ -18,7 +18,6 @@ t_thread = 0
 g_thread = 0
 
 
-
 @QtCore.pyqtSlot(int,int)
 def updatePlots(value,theta):
     """
@@ -27,8 +26,6 @@ def updatePlots(value,theta):
     global plot_update_signal_wrappers
     for sig in plot_update_signal_wrappers:
         sig.go(value,theta)
-
-
 
 
 def make():
@@ -54,6 +51,11 @@ def make():
     polarLayout = Qt.QVBoxLayout(polarWidget)
     polarLayout.addWidget(polarPlot)
     
+    #text box for output
+    label=Qt.QLabel("Delta Angle")
+    delta=Qt.QLineEdit("0.0")
+    label.setBuddy(delta)
+    
     #set sizes
     stripWidget.resize(600, 400)
     polarWidget.resize(600,600)
@@ -64,6 +66,8 @@ def make():
     windowWidget.setLayout(windowLayout)
     windowLayout.addWidget(stripWidget)
     windowLayout.addWidget(polarWidget)
+    windowLayout.addWidget(label)
+    windowLayout.addWidget(delta)    
     windowWidget.setWindowTitle("IR Range")
     windowWidget.show()
 
@@ -72,8 +76,6 @@ def make():
     plot_update_signal_wrappers.append(SigWrapper(stripChart.updatePlot))
     plot_update_signal_wrappers.append(SigWrapper(polarPlot.polarUpdate))
     return stripWidget,   polarWidget, windowWidget     
-
-
 
 def stop_threads():
     """
