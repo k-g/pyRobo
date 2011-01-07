@@ -129,7 +129,7 @@ def find_angle(reference, secondary):
     
     #these 2 must be even numbers th
     window_width    =   16               #width of search space. larger = slower, more accurate
-    offset_width    =   16              #amount of side-to-side oscillation. lower = faster, less accurate
+    offset_width    =   20              #amount of side-to-side oscillation. lower = faster, less accurate
     
     center          =   26              #center of rotation
     
@@ -173,13 +173,14 @@ def find_angle(reference, secondary):
 
 def generate_test_readings(shift_indices, size=80):
     """
-    Returns a pair of readings. One is shifted and noisey
+    Returns a pair of readings. One is shifted and noisy
     """
     shift_size  =   -shift_indices           
     start       =   numpy.random.random_integers(80, 160,  size=(size,))    #simulated measurement
-    end         =   (start[:]+numpy.random.randint(-10,10, size=(size,)))   #simulated noisey second measurement
 
-    #todo: add a 'spike' to help us verify rotation visually
+    start[40]   =   27      #simulated 'spike' to help track on chart
+
+    end         =   (start[:]+numpy.random.randint(-10,10, size=(size,)))   #simulated noisey second measurement
 
     readings    =   start[10:-10]                                           #take slices
     readings2   =   end[10+shift_size:-10+shift_size]                       #take shifted slices
@@ -199,7 +200,7 @@ def serialGenerate(serial_obj):
     while isAlive:
         try:
 
-            readings, readings2 = generate_test_readings(-5)
+            readings, readings2 = generate_test_readings(-9)
                      
             
             while l < loops:
@@ -215,6 +216,7 @@ def serialGenerate(serial_obj):
                     if radians > (2 * math.pi):
                         radians = 0.0
                                     
+                    #run twice
                     if l == 0:
                         some_num = int(readings[count_inc])#int(random.randint(0, 5) + 120*(1 + math.sin(radians)))
                     else:
