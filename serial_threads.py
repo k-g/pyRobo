@@ -15,9 +15,9 @@ def error_calc(reference, secondary):
     """
     error = 0
     for i in range(len(reference)):
-        print "\t",reference
-        print "\t",secondary
-        print "\t","-"*5
+        #print "\t",reference
+       # print "\t",secondary
+        #print "\t","-"*5
         error += abs(reference[i] - secondary[i])
 
     return error
@@ -53,7 +53,7 @@ def find_angle(reference, secondary):
         
         secondary_start     =   center  + relative_offset - window_width/2 #- (offset_width/2) + o
 
-        print secondary_start, secondary[secondary_start], relative_offset
+        #print secondary_start, secondary[secondary_start], relative_offset
         secondary_end       =   secondary_start + window_width
         secondary_window    =   secondary[secondary_start:secondary_end]
 
@@ -64,7 +64,7 @@ def find_angle(reference, secondary):
             nearest_offset  =   relative_offset
              
 
-    print angle_errors
+   # print angle_errors
     
 
 
@@ -124,7 +124,7 @@ def serialMonitor(serial_obj, alert_function):
     """
     global isAlive
     data=""
-    dataList = deque([0,0,0,0,0,0,0,0,0,0,0,0])
+    dataList = deque([0,0,0,0,0,0])
     sig = SigWrapper(alert_function)
 
     while isAlive:
@@ -142,7 +142,7 @@ def serialMonitor(serial_obj, alert_function):
                     angle_theta = (angle_reading-21)*(180/(75-21))
                     sig.go(adc_reading, angle_reading)                    
                 except ValueError, e:
-                    pass
+                   raise# pass
                     
 
         except serial.SerialException, e:
@@ -223,7 +223,8 @@ def serialGenerate(serial_obj):
 
                     serial_obj.write(num2hex(some_num))
                     serial_obj.write(num2hex(count_inc))
-
+                    
+                    print "count:",count_inc
                     count_inc += 1
                 
                 l += 1            

@@ -17,7 +17,8 @@ from serial_threads import *
 t_thread = 0
 g_thread = 0
 updates = 0                    #counts our packets
-readings, readings2 = numpy.zeros(54),numpy.zeros(54)    #stores new and old data
+readings1 = numpy.zeros(54)
+readings2 = numpy.zeros(54)    #stores new and old data
 delta    =    None
 
 @QtCore.pyqtSlot(int,int)
@@ -25,14 +26,23 @@ def updatePlots(value,theta):
     """
     The slot that updates local plots when new data arrives
     """
-    global readings, readings2, delta    
+   # global readings1, readings2, delta    
     
+    
+   
     #update buffers
+    readings1[theta]   =      readings2[theta]
+    print readings1[theta]
+
     readings2[theta]    =     value
+    print readings2[theta]    
+    
+    print theta
     
     if theta == 53:
-        angle_str = str(find_angle(readings, readings2))
-        readings = readings2[:]        #deep copy on finish
+        #print readings1, readings2
+        angle_str = str(find_angle(readings1, readings2))
+       # readings1 = readings2[:]        #deep copy on finish
         delta.setText(angle_str)
      
 
