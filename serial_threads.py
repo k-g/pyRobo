@@ -140,6 +140,7 @@ def serialMonitor(serial_obj, alert_function):
                     adc_reading = int(dataList[2],16)*16 + int(dataList[3],16)
                     angle_reading = int(dataList[4],16)*16 + int(dataList[5],16)
                     angle_theta = (angle_reading-21)*(180/(75-21))
+                    print dataList
                     sig.go(adc_reading, angle_reading)                    
                 except ValueError, e:
                    raise# pass
@@ -224,12 +225,12 @@ def serialGenerate(serial_obj):
                     serial_obj.write(num2hex(some_num))
                     serial_obj.write(num2hex(count_inc))
                     
-                    print "count:",count_inc
+                    print "count:",count_inc, " some_num=",some_num
                     count_inc += 1
                 
                 l += 1            
             
-            setAlive(0)
+            #setAlive(0)    #if we re-enable this, then the calculation will not have time to complete
 
             #print find_angle(readings, readings2)
 

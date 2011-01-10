@@ -26,8 +26,11 @@ def updatePlots(value,theta):
     """
     The slot that updates local plots when new data arrives
     """
-   # global readings1, readings2, delta    
-    
+    global readings1, readings2, delta
+    global plot_update_signal_wrappers
+    for sig in plot_update_signal_wrappers:
+        sig.go(value,theta)
+
     
    
     #update buffers
@@ -48,9 +51,6 @@ def updatePlots(value,theta):
 
     
     
-    global plot_update_signal_wrappers
-    for sig in plot_update_signal_wrappers:
-        sig.go(value,theta)
 
 
 def make():
