@@ -44,7 +44,7 @@ def updatePlots(value,theta):
     
     if theta == 53:
         #print readings1, readings2
-        angle_str = str(find_angle(readings1, readings2))
+        angle_str = "Turned %3.2f degrees" % find_angle(readings1, readings2)["Angle"]
        # readings1 = readings2[:]        #deep copy on finish
         delta.setText(angle_str)
      
@@ -78,7 +78,7 @@ def make():
     
     #text box for output
     label=Qt.QLabel("Delta Angle")
-    delta=Qt.QLineEdit("0.0")
+    delta=Qt.QLineEdit("No change yet detected")
     label.setBuddy(delta)
     
     #set sizes

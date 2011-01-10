@@ -68,7 +68,7 @@ def find_angle(reference, secondary):
     
 
 
-    return "Angle: ", closest_angle, "Offset: ", nearest_offset
+    return {"Angle":closest_angle, "Offset": nearest_offset}
 
 
 
@@ -126,7 +126,7 @@ def serialMonitor(serial_obj, alert_function):
     data=""
     dataList = deque([0,0,0,0,0,0])
     sig = SigWrapper(alert_function)
-
+    print dataList
     while isAlive:
         try:
             the_new_val    =     serial_obj.read(1)
