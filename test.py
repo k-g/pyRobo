@@ -35,12 +35,12 @@ def updatePlots(value,theta):
    
     #update buffers
     readings1[theta]   =      readings2[theta]
-    print readings1[theta]
+    #print readings1[theta]
 
     readings2[theta]    =     value
-    print readings2[theta]    
+    #print readings2[theta]    
     
-    print theta
+    #print theta
     
     if theta == 53:
         #print readings1, readings2
