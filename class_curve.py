@@ -45,6 +45,13 @@ class Curve:
 
 		self._data.append( self._filter(val) )
 
+	@QtCore.pyqtSlot(tuple)		
+	def setDataPoint(self,	index, val):
+		"""
+		Update data in the dataset
+		"""
+		self._data[index] =  self._filter(val)
+
 	def unzipData(self):
 		"""
 		returns X,Y tuple of data

@@ -4,6 +4,8 @@ import PyQt4.Qwt5 as Qwt                #Qwt graphing
 from PyQt4.Qwt5.anynumpy import *       #imports the latest numpy
 from util_functions import rangeConvert
 
+from class_curve import Curve
+
 class StripChartLine(Qwt.QwtPlotCurve):
     """
     Represents a curve or line on a strip chart
