@@ -45,6 +45,13 @@ class Curve:
 
 		self._data.append( self._filter(val) )
 
+	def unzipData(self):
+		"""
+		returns X,Y tuple of data
+		"""
+		x,y = zip(*(self.getData()))
+		return list(x),list(y)
+
 	def getData(self):
 		"""
 		Return data set
@@ -62,8 +69,9 @@ class Curve:
 if __name__ == '__main__':
     
     c	=	Curve()
-    c.addDataPoint((0,0,0))
-    c.addDataPoint((0,0,0))
-    c.addDataPoint((0,0,0))
-    c.addDataPoint((0,0,0))
+    c.addDataPoint((0,0))
+    c.addDataPoint((3,0))
+    c.addDataPoint((0,2))
+    c.addDataPoint((0,0))
     print c
+    print c.unzipData()
